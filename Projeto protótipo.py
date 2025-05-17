@@ -1,10 +1,10 @@
 import os
 
 # Arquivos
-ARQ_USUARIOS = "usuarios.txt"
-ARQ_MUSICAS = "musicas.txt"
-ARQ_HISTORICO = "historico.txt"
-ARQ_PLAYLISTS = "playlists.txt"
+USUARIOS = "usuarios.txt"
+MUSICAS = "musicas.txt"
+HISTORICO = "historico.txt"
+PLAYLISTS = "playlists.txt"
 
 # Menus
 MENU_PRINCIPAL = {
@@ -13,7 +13,7 @@ MENU_PRINCIPAL = {
     0: "Sair"
 }
 
-MENU_USUARIO = {
+MENU_DO_USUARIO = {
     1: "Buscar músicas",
     2: "Curtir/descurtir música",
     3: "Visualizar histórico",
@@ -29,7 +29,7 @@ MENU_PLAYLISTS = {
     5: "Listar playlists",
     0: "Voltar"
 }
-MUSICAS_DEFINIDAS = [
+ESCOLHA_DE_MUSICAS = [
     {"id": "1", "nome": "dunkelheit", "artista": "Burzum", "genero": "Rock"},
     {"id": "2", "nome": "beautiful demains", "artista": "Black Veil Brides", "genero": "Rock"},
     {"id": "3", "nome": "love story", "artista": "Taylor Swift", "genero": "Pop"},
@@ -45,18 +45,18 @@ def exibir_menu(menu):
     for op, desc in menu.items():
         print(f"{op} - {desc}")
 
-# ========== USUÁRIOS ==========
+# Usuário
 def cadastrar_usuario():
-    nome = input("Digite seu nome de usuário: ")
-    senha = input("Digite uma senha: ")
-    with open(ARQ_USUARIOS, "a", encoding="utf-8") as f:
+    nome = input("Cadastre seu nome de usuário: ")
+    senha = input("Cadastre sua senha: ")
+    with open(USUARIOS, "a", encoding="utf-8") as f:
         f.write(f"{nome};{senha}\n")
     print("Usuário cadastrado!")
 
 def login():
     nome = input("Usuário: ")
     senha = input("Senha: ")
-    with open(ARQ_USUARIOS, "r", encoding="utf-8") as f:
+    with open(USUARIOS, "r", encoding="utf-8") as f:
         for linha in f:
             user, passw = linha.strip().split(";")
             if nome == user and senha == passw:
@@ -69,39 +69,37 @@ def login():
                 return
     print("Usuário ou senha incorretos.")
 
-# ========== MÚSICAS ==========
-
-
+# Músicas
 def buscar_musicas():
     termo = input("Nome da música: ").lower()
-    musicas = MUSICAS_DEFINIDAS
+    musicas = ESCOLHA_DE_MUSICAS
     achadas = [m for m in musicas if termo in m["nome"].lower()]
     if achadas:
         for m in achadas:
             print(f"{m['id']}: {m['nome']} - {m['artista']} ({m['genero']})")
     else:
-        print("Nenhuma música encontrada.")
+        print("Música não encontrada.")
 
-# ========== CURTIR / HISTÓRICO ==========
+# Curtir e descurtir
 def curtir_ou_descurtir(usuario):
-    musicas = MUSICAS_DEFINIDAS
+    musicas = ESCOLHA_DE_MUSICAS
     for m in musicas:
         print(f"{m['id']}: {m['nome']} - {m['artista']}")
-    id_musica = input("Digite o ID da música: ")
+    id_musica = input("Digite o ID da música que quer curtir: ")
     acao = input("curtir ou descurtir? ").lower()
     if acao in ["curtir", "descurtir"]:
-        with open(ARQ_HISTORICO, "a", encoding="utf-8") as f:
+        with open(HISTORICO, "a", encoding="utf-8") as f:
             f.write(f"{usuario};{id_musica};{acao}\n")
         print(f"Música {acao} registrada!")
     else:
-        print("Ação inválida.")
-
+        print("Error")
+# Histórico
 def visualizar_historico(usuario):
-    musicas = MUSICAS_DEFINIDAS
+    musicas = ESCOLHA_DE_MUSICAS
     curtidas = []
     descurtidas = []
-    if os.path.exists(ARQ_HISTORICO):
-        with open(ARQ_HISTORICO, "r", encoding="utf-8") as f:
+    if os.path.exists(HISTORICO):
+        with open(HISTORICO, "r", encoding="utf-8") as f:
             for linha in f:
                 user, id_musica, acao = linha.strip().split(";")
                 if user == usuario:
@@ -118,18 +116,18 @@ def visualizar_historico(usuario):
     for m in descurtidas:
         print(f"- {m['nome']} - {m['artista']}")
 
-# ========== PLAYLISTS ==========
+# Playlists
 def carregar_playlists():
     playlists = {}
-    if os.path.exists(ARQ_PLAYLISTS):
-        with open(ARQ_PLAYLISTS, "r", encoding="utf-8") as f:
+    if os.path.exists(PLAYLISTS):
+        with open(PLAYLISTS, "r", encoding="utf-8") as f:
             for linha in f:
                 user, nome, ids = linha.strip().split(";")
                 playlists[(user, nome)] = ids.split(",") if ids else []
     return playlists
 
 def salvar_playlists(playlists):
-    with open(ARQ_PLAYLISTS, "w", encoding="utf-8") as f:
+    with open(PLAYLISTS, "w", encoding="utf-8") as f:
         for (user, nome), ids in playlists.items():
             f.write(f"{user};{nome};{','.join(ids)}\n")
 
@@ -150,7 +148,7 @@ def adicionar_musica_playlist(user):
     if chave not in playlists:
         print("Playlist não existe.")
         return
-    musicas = MUSICAS_DEFINIDAS
+    musicas = ESCOLHA_DE_MUSICAS
     for m in musicas:
         print(f"{m['id']}: {m['nome']}")
     id_musica = input("ID da música: ")
@@ -187,7 +185,7 @@ def excluir_playlist(user):
 
 def listar_playlists(user):
     playlists = carregar_playlists()
-    musicas = MUSICAS_DEFINIDAS
+    musicas = ESCOLHA_DE_MUSICAS
     for (u, nome), ids in playlists.items():
         if u == user:
             print(f"\nPlaylist: {nome}")
@@ -196,7 +194,7 @@ def listar_playlists(user):
                 if m:
                     print(f" - {m['nome']} - {m['artista']}")
 
-# ========== MENUS ==========
+# Menus
 def menu_playlists(usuario):
     while True:
         print("\n== PLAYLISTS ==")
@@ -220,7 +218,7 @@ def menu_playlists(usuario):
 def menu_usuario(usuario):
     while True:
         print(f"\n== SPOTIFEI - Usuário: {usuario} ==")
-        exibir_menu(MENU_USUARIO)
+        exibir_menu(MENU_DO_USUARIO)
         op = int(input("Opção: "))
         if op == 1:
             buscar_musicas()
