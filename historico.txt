@@ -1,4 +1,0 @@
-LUIZ;1;curtir
-LUIZ;1;descurtir
-luiz;4;curtir
-luiz;2;descurtir
