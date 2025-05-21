@@ -43,9 +43,11 @@ def buscar():
 def curtir(usuario):
     for m in MUSICAS:
         print(f"{m['id']}: {m['nome']} - {m['artista']} - {m['genero']}")
+    
     idm = input("ID da música: ")
     print("[1] Curtir  [2] Descurtir")
     op = input("Escolha: ")
+
     if op == "1":
         acao = "curtida"
     elif op == "2":
@@ -53,9 +55,27 @@ def curtir(usuario):
     else:
         print("Opção inválida.")
         return
-    with open(HISTORICO, "a", encoding="utf-8") as f:
-        f.write(usuario + ";" + idm + ";" + acao + "\n")
-    print(f"Música {acao} !")
+
+    linhas_novas = []
+    atualizado = False
+    if os.path.exists(HISTORICO):
+        with open(HISTORICO, "r", encoding="utf-8") as f:
+            for linha in f:
+                user, musica_id, _acao = linha.strip().split(";")
+                if user == usuario and musica_id == idm:
+                    linhas_novas.append(f"{usuario};{idm};{acao}\n")
+                    atualizado = True
+                else:
+                    linhas_novas.append(linha)
+    
+    if not atualizado:
+        
+        linhas_novas.append(f"{usuario};{idm};{acao}\n")
+
+    with open(HISTORICO, "w", encoding="utf-8") as f:
+        f.writelines(linhas_novas)
+
+    print(f"Música {acao} registrada com sucesso!")
 
 def historico(usuario):
     if os.path.exists(HISTORICO):
